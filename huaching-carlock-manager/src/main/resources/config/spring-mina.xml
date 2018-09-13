@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd 
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd"
+	default-autowire="byName" default-lazy-init="false">
+	
+	<!-- Mina 数据编码 -->
+	<bean id="dpsProtocolCodecFactory" class="com.chinadovey.parking.webapps.mina.DPSProtocolCodecFactory" />
+	
+	<bean id="gatewayLogBiz" class="com.chinadovey.parking.webapps.biz.impl.GatewayLogBizImpl" />
+	
+	<bean id="carLockBiz" class="com.chinadovey.parking.webapps.biz.impl.CarLockBizImpl" />
+
+	<!-- Mina 数据请求处理 -->
+	<bean id="trapHandler" class="com.chinadovey.parking.webapps.mina.CloudNodeIoHandler">
+		<property name="localAddress" value="${dovey.cloud.node.localaddress}" />
+		<property name="mongoOps" ref="mongoOps" />
+		<property name="gatewayLogBiz" ref="gatewayLogBiz" />
+		<property name="carLockBiz" ref="carLockBiz" />
+		<property name="dpsProcess">
+			<!-- 数据包处理 -->
+			<bean class="com.chinadovey.parking.webapps.mina.DPSProcess">
+				<property name="localAddress" value="${dovey.cloud.node.localaddress}" />
+				<property name="mongoOps" ref="mongoOps" />
+				<property name="rtuProcessFactory" ref="RTUProcessFactory" />
+				<property name="gatewayLogBiz" ref="gatewayLogBiz" />
+				<property name="carLockBiz" ref="carLockBiz" />
+			</bean>
+		</property>
+	</bean>
+
+	<!-- 分类数据处理 -->
+	<bean id="RTUProcessFactory" class="com.chinadovey.parking.webapps.mina.RTUProcessFactory">
+		<property name="processes">
+			<map>
+        <entry key="0810">
+          <bean class="com.chinadovey.parking.webapps.mina.protocol.RTUProcess0810" />
+        </entry>
+        <entry key="0713">
+          <bean class="com.chinadovey.parking.webapps.mina.protocol.RTUProcess0713" />
+        </entry>
+        <entry key="0710">
+          <bean class="com.chinadovey.parking.webapps.mina.protocol.RTUProcess0710" />
+        </entry>
+		<entry key="0611">
+			<bean class="com.chinadovey.parking.webapps.mina.protocol.RTUProcess0611" />
+		</entry>
+			</map>
+		</property>
+	</bean>
+	
+	
+
+<!-- 组装Mina服务 -->
+	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<property name="customEditors">
+			<map>
+				<entry key="java.net.SocketAddress">
+					<bean class="org.apache.mina.integration.beans.InetSocketAddressEditor" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="mdcInjectionFilter" class="org.apache.mina.filter.logging.MdcInjectionFilter">
+		<constructor-arg value="remoteAddress" />
+	</bean>
+	<bean id="executorFilter" class="org.apache.mina.filter.executor.ExecutorFilter" />
+	<bean id="loggingFilter" class="org.apache.mina.filter.logging.LoggingFilter" />
+	<bean id="protocolCodecFilter" class="org.apache.mina.filter.codec.ProtocolCodecFilter">
+		<constructor-arg ref="dpsProtocolCodecFactory" />
+	</bean>
+
+	<bean id="filterChainBuilder"
+		class="org.apache.mina.core.filterchain.DefaultIoFilterChainBuilder">
+		<property name="filters">
+			<map>
+				<entry key="executor" value-ref="executorFilter" />
+				<entry key="mdcInjectionFilter" value-ref="mdcInjectionFilter" />
+				<entry key="codecFilter" value-ref="protocolCodecFilter" />
+				<entry key="loggingFilter" value-ref="loggingFilter" />
+			</map>
+		</property>
+	</bean>
+
+	<bean id="ioAcceptor" class="org.apache.mina.transport.socket.nio.NioSocketAcceptor">
+		<property name="defaultLocalAddress" value="${dovey.cloud.node.localaddress}" />
+		<property name="handler" ref="trapHandler" />
+		<property name="filterChainBuilder" ref="filterChainBuilder" />
+		<property name="reuseAddress" value="true" />
+	</bean>
+
+	<!-- 云服务核心组件 -->
+    <bean id="minaServer" class="com.chinadovey.parking.webapps.mina.MinaServer"
+		init-method="start" destroy-method="destroy">
+		<property name="ioAcceptor" ref="ioAcceptor" />
+		<property name="mongoOps" ref="mongoOps" />
+	</bean>
+	
+</beans>

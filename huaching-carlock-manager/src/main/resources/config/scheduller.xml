@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+	default-autowire="byName">
+
+	<bean id="checkGatewayDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="concurrent" value="false" />
+		<property name="targetObject" ref="checkGatewayScheduler" />
+		<property name="targetMethod" value="check" />
+	</bean>
+	<bean id="checkGatewayTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="checkGatewayDetail" />
+		<property name="cronExpression" value="0 1/10 * * * ?" />
+	</bean>
+	
+    
+	<!-- 宁波优泊停车 主动推送车位锁信息的接口 -->
+    <bean id="heartbeatDetail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="concurrent" value="false" />
+		<property name="targetObject" ref="heartbeatScheduler" />
+		<property name="targetMethod" value="autopush" />
+	</bean>
+	<bean id="heartbeatTrigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="heartbeatDetail" />
+		<property name="cronExpression" value="0 0 1/1 * * ?" />
+	</bean>
+	
+	
+	<!-- 调度工厂 -->
+	<bean autowire="no" id="startQuertz" lazy-init="false"
+		class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+			     <!--  
+			     
+				 <ref bean="heartbeatTrigger" /> 
+				 -->
+				 <!-- <ref bean="checkGatewayTrigger" /> -->
+				 
+			</list>
+		</property>
+	</bean>
+</beans>

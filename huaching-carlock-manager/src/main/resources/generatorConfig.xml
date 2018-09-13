@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration>
+	<classPathEntry location="lib/mysql-connector-java-5.1.26.jar" />
+	<context id="parking-client">
+		<plugin
+			type="org.chinadovey.tools.mybatis.generator.MySQLPaginationPlugin2" />
+		<jdbcConnection driverClass="com.mysql.jdbc.Driver"
+			connectionURL="jdbc:mysql://projects.zhrhq.com:3306/huaching_carlock?characterEncoding=UTF-8"
+			userId="root" password="huaching" />
+		<javaModelGenerator targetPackage="com.chinadovey.parking.webapps.pojo"
+			targetProject="src/main/java" />
+		<sqlMapGenerator targetPackage="com.chinadovey.parking.webapps.mappers.gen"
+			targetProject="src/main/resources" />
+		<javaClientGenerator targetPackage="com.chinadovey.parking.webapps.mappers.gen"
+			targetProject="src/main/java" type="XMLMAPPER" />
+			
+		<table tableName="parking_carlock" domainObjectName="Carlock" />
+		<table tableName="parking_carlock_data" domainObjectName="CarlockData" />
+	</context>
+</generatorConfiguration>
