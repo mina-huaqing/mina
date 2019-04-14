@@ -17,7 +17,16 @@
 	
 	<bean id="carLockBiz" class="com.chinadovey.parking.webapps.biz.impl.CarLockBizImpl" />
 
-	<!-- Mina 数据请求处理 -->
+	<!-- Mina 数据请求处理 
+		mina框架规则：
+		1、数据收发都必须经过编解码，接收的数据需要解码，然后封装到类的实例中。 发出的数据需要编码
+		2、框架用户自定义类继承IoHandlerAdapter类，收到的数据会交由该类处理，具体方法是：messageReceived(IoSession session, Object message)
+		3、连接mina server的网络程序，可设置一个唯一标识。mina server根据这一标识，用于和改网络程序的session会话，相对应。这样就可以找到该程序，session中含有程序的地址。
+		4、NioSocketConnector这是mina客户端类，用于连接mina服务器。比如：向外发送数据，就需要该类连接mina服务端。
+			mina server收到之后，再根据数据内容判断是谁发送来的，怎么处理。
+			常见session.write("数据")，session会话有两个地址，发给谁？。方法注释：Writes the specified message to remote peer
+			在mina服务端程序来看，谁连接我谁远，是发送给它。mina客户端程序，连接的谁谁远，发送给对方（mina服务端）。
+	-->
 	<bean id="trapHandler" class="com.chinadovey.parking.webapps.mina.CloudNodeIoHandler">
 		<property name="localAddress" value="${dovey.cloud.node.localaddress}" />
 		<property name="mongoOps" ref="mongoOps" />

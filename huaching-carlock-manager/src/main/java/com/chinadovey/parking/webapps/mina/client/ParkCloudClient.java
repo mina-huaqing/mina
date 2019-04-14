@@ -68,7 +68,7 @@ public class ParkCloudClient {
 		packetsEntity.setValuePackets(valuePacket);
 		packetsEntity.finishFilling();
 
-		// 2.初始化服务器连接
+		// 2.初始化服务器连接（连接mina服务器，mina服务器收到消息之后，再根据协议内容，决定发送到哪个外部程序。）
 		init(new IoHandlerAdapter() {
 			public void messageReceived(IoSession session, Object message)
 					throws Exception {
@@ -81,7 +81,7 @@ public class ParkCloudClient {
 
 		long t1 = System.currentTimeMillis();
 
-		// 3.发送命令
+		// 3.发送命令（发送命名到mina服务器）
 		IoSession session = future.getSession();
 		session.write(packetsEntity);
 
