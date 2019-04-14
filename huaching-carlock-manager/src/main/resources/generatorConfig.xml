@@ -6,8 +6,8 @@
 		<plugin
 			type="org.chinadovey.tools.mybatis.generator.MySQLPaginationPlugin2" />
 		<jdbcConnection driverClass="com.mysql.jdbc.Driver"
-			connectionURL="jdbc:mysql://projects.zhrhq.com:3306/huaching_carlock?characterEncoding=UTF-8"
-			userId="root" password="huaching" />
+			connectionURL="jdbc:mysql://:3306/huaching_carlock?characterEncoding=UTF-8"
+			userId="" password="" />
 		<javaModelGenerator targetPackage="com.chinadovey.parking.webapps.pojo"
 			targetProject="src/main/java" />
 		<sqlMapGenerator targetPackage="com.chinadovey.parking.webapps.mappers.gen"
