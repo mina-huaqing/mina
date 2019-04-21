@@ -97,7 +97,7 @@
 			</map>
 		</property>
 	</bean>
-
+	<!-- 绑定端口等等 -->
 	<bean id="ioAcceptor" class="org.apache.mina.transport.socket.nio.NioSocketAcceptor">
 		<property name="defaultLocalAddress" value="${dovey.cloud.node.localaddress}" />
 		<property name="handler" ref="trapHandler" />

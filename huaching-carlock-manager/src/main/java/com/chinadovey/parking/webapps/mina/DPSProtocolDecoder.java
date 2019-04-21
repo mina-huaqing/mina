@@ -42,17 +42,17 @@ public class DPSProtocolDecoder extends CumulativeProtocolDecoder {
 	protected boolean doDecode(IoSession session, IoBuffer in,
 			ProtocolDecoderOutput out) throws Exception {
 		byte c;
-		while (in.hasRemaining()) {
-			c = in.get();
-			if (c == PacketsEntity.START_FLAG_C && p == c) {
+		while (in.hasRemaining()) { // 当且仅当此缓冲区中至少有一个元素保留时才返回true
+			c = in.get();// 相对get方法。 读取此缓冲区当前位置的字节，然后递增位置。
+			if (c == PacketsEntity.START_FLAG_C && p == c) { // 1、当第一个c等于7b时，后面p=c赋值。2、第二个c等于7b，而p值不变时，进入if方法区。
 				m = 1;
 				buf_idx = 0;
 				continue;
 			}
-
+			//7b 7b 34，当34时
 			switch (m) {
 			case 0:
-				break;
+				break;//结束当前switch循环
 			case 1:
 				buf[buf_idx++] = c;
 				if (buf_idx == 4) {
